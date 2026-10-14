@@ -1,0 +1,717 @@
+% !TEX program = xelatex
+% !TEX encoding = UTF-8 Unicode
+% =====================================================================
+% BÁO CÁO TIỂU LUẬN - MÔN KHAI PHÁ DỮ LIỆU
+% Chủ đề 1 (Recursive Self-Improvement), bài số 5:
+% "Recursive Criticality of AI Self-Improvement" (M. Burtsev, 2026)
+%
+% BIÊN DỊCH: bắt buộc dùng XeLaTeX (không dùng pdfLaTeX).
+%   - Overleaf : Menu -> Compiler -> XeLaTeX (đã có sẵn tệp latexmkrc)
+%   - VS Code  : cài LaTeX Workshop, mở main.tex, bấm Build (cấu hình trong .vscode)
+%   - Dòng lệnh: latexmk -xelatex main.tex
+% =====================================================================
+\documentclass[12pt,a4paper,openany]{report}
+
+% ---------- Font và ngôn ngữ (XeLaTeX) ----------
+\usepackage{fontspec}
+% Dùng font kiểu Times (TeX Gyre Termes); nếu máy không có thì tự dùng Latin Modern
+\IfFontExistsTF{TeX Gyre Termes}{\setmainfont{TeX Gyre Termes}}{\setmainfont{Latin Modern Roman}}
+\IfFontExistsTF{TeX Gyre Heros}{\setsansfont{TeX Gyre Heros}}{\setsansfont{Latin Modern Sans}}
+\setmonofont{Latin Modern Mono}
+
+% ---------- Trình bày ----------
+\usepackage[left=3cm,right=2cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{setspace}
+\setstretch{1.25}
+\usepackage{indentfirst}           % thụt dòng đầu cả ở đoạn đầu tiên
+\setlength{\parindent}{1cm}
+\setlength{\parskip}{0pt}
+\usepackage{microtype}
+\sloppy\emergencystretch=3em       % căn lề hai phía, hạn chế tràn dòng
+
+% ---------- Toán, bảng, hình ----------
+\usepackage{amsmath,amssymb}
+\numberwithin{equation}{chapter}   % (3.1), (3.2), ... đặt ở lề phải
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage{booktabs,array,longtable,tabularx}
+\usepackage{enumitem}
+\setlist{itemsep=2pt,topsep=3pt}
+\usepackage{xcolor}
+\usepackage[font=small,labelfont=bf,labelsep=period]{caption}
+\captionsetup[table]{position=top}
+\captionsetup[figure]{position=bottom}
+\usepackage{amsthm}
+\theoremstyle{definition}
+\newtheorem{menhde}{Mệnh đề}[chapter]
+
+% ---------- Số trang ----------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+% ---------- Siêu liên kết ----------
+\usepackage[unicode,hidelinks,pageanchor=false]{hyperref}
+\hypersetup{pdftitle={Báo cáo tiểu luận: Recursive Criticality of AI Self-Improvement},
+            pdfauthor={Nhóm sinh viên}}
+
+% ---------- Tên tiếng Việt cho các nhãn tự động ----------
+\renewcommand{\contentsname}{Mục lục}
+\renewcommand{\listfigurename}{Danh mục hình}
+\renewcommand{\listtablename}{Danh mục bảng}
+\renewcommand{\figurename}{Hình}
+\renewcommand{\tablename}{Bảng}
+\renewcommand{\chaptername}{Chương}
+\renewcommand{\bibname}{Tài liệu tham khảo}
+\renewcommand{\appendixname}{Phụ lục}
+
+% ---------- Lệnh tiện ích ----------
+\newif\ifdraft \drafttrue          % đổi thành \draftfalse để ẩn mọi nhắc việc màu đỏ
+\newcommand{\todo}[1]{\ifdraft\textcolor{red}{[\textbf{CẦN BỔ SUNG:} #1]}\fi}
+\newcommand{\RAI}{\mathcal{R}_{\mathrm{AI}}}
+\newcommand{\Rnet}{\mathcal{R}_{\mathrm{net}}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\en}[1]{\textit{#1}}   % thuật ngữ tiếng Anh in nghiêng
+\newcommand{\code}[1]{\texttt{#1}}
+
+\begin{document}
+
+% =====================================================================
+% TRANG BÌA
+% =====================================================================
+\begin{titlepage}
+\thispagestyle{empty}
+\centering
+\setstretch{1.2}
+{\large\bfseries \todo{TÊN TRƯỜNG}}\\[2pt]
+{\large\bfseries \todo{TÊN KHOA / VIỆN}}\\[6pt]
+\rule{0.55\textwidth}{0.6pt}\\[3.2cm]
+
+{\Large\bfseries BÁO CÁO TIỂU LUẬN}\\[10pt]
+{\large\bfseries MÔN HỌC: KHAI PHÁ DỮ LIỆU}\\[1.6cm]
+
+\begin{minipage}{0.88\textwidth}
+\centering
+{\large \textbf{Chủ đề 1:} \en{Recursive Self-Improvement}}\\[6pt]
+{\large \textbf{Bài số 5:} \en{Recursive Criticality of AI Self-Improvement}}\\[6pt]
+{\normalsize (M.~Burtsev, arXiv:2609.00137, 2026)}
+\end{minipage}\\[2.2cm]
+
+\begin{tabular}{@{}p{5.6cm}p{8cm}@{}}
+\textbf{Giảng viên hướng dẫn:} & \todo{Họ tên giảng viên}\\[6pt]
+\textbf{Lớp:} & \todo{Lớp / mã lớp học phần}\\[6pt]
+\textbf{Nhóm sinh viên thực hiện:} & \\
+\end{tabular}\\[4pt]
+
+\begin{tabular}{@{}p{1.1cm}p{5.6cm}p{3.4cm}@{}}
+\toprule
+\textbf{STT} & \textbf{Họ và tên} & \textbf{MSV}\\
+\midrule
+1 & Tạ Quang Đông & 24022627\\
+2 & \todo{Họ tên} & \todo{MSV}\\
+3 & \todo{Họ tên} & \todo{MSV}\\
+\bottomrule
+\end{tabular}
+
+\vfill
+{\normalsize \todo{Địa điểm}, tháng 10 năm 2026}
+\end{titlepage}
+
+% =====================================================================
+% PHẦN NGHI THỨC (đánh số trang La Mã)
+% =====================================================================
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+\tableofcontents
+
+\clearpage
+\addcontentsline{toc}{chapter}{\listfigurename}
+\listoffigures
+
+\clearpage
+\addcontentsline{toc}{chapter}{\listtablename}
+\listoftables
+
+\clearpage
+\chapter*{Danh mục viết tắt}
+\addcontentsline{toc}{chapter}{Danh mục viết tắt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{5.4cm}>{\raggedright\arraybackslash}p{6.4cm}@{}}
+\toprule
+\textbf{Viết tắt} & \textbf{Nghĩa đầy đủ (tiếng Anh)} & \textbf{Diễn giải (tiếng Việt)}\\
+\midrule
+\endhead
+AGI & \en{Artificial General Intelligence} & Trí tuệ nhân tạo tổng quát\\
+AI  & \en{Artificial Intelligence} & Trí tuệ nhân tạo\\
+ARI & \en{Adjusted Rand Index} & Chỉ số Rand điều chỉnh (đánh giá phân cụm)\\
+ASI & \en{Artificial Super Intelligence} & Siêu trí tuệ nhân tạo\\
+CV  & \en{Cross-Validation} & Kiểm định chéo\\
+DDE & \en{Delay Differential Equation} & Phương trình vi phân có trễ\\
+RF  & \en{Random Forest} & Rừng ngẫu nhiên\\
+R\&D & \en{Research and Development} & Nghiên cứu và phát triển\\
+RSI & \en{Recursive Self-Improvement} & Tự cải tiến đệ quy\\
+\bottomrule
+\end{longtable}
+
+\clearpage
+\chapter*{Danh mục thuật ngữ}
+\addcontentsline{toc}{chapter}{Danh mục thuật ngữ}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{3.4cm}>{\raggedright\arraybackslash}p{3.6cm}>{\raggedright\arraybackslash}p{7cm}@{}}
+\toprule
+\textbf{Thuật ngữ} & \textbf{Tiếng Anh} & \textbf{Giải thích ngắn}\\
+\midrule
+\endhead
+Số tái sản xuất đệ quy & \en{recursive reproduction number} & Đại lượng $\RAI=g/\sigma$ so sánh độ mạnh phản hồi đệ quy với mức cứng hóa của biên nghiên cứu; ngưỡng tới hạn tại $\RAI=1$.\\
+Độ lợi đệ quy & \en{recursive gain} & Mức năng lực AI hiện tại làm tăng năng suất nghiên cứu cho các thế hệ sau.\\
+Đóng vận hành & \en{operational closure} & Tỷ lệ cải tiến thực sự đi qua quy trình đánh giá, huấn luyện, triển khai để vào hệ kế tiếp ($0\le\chi\le1$).\\
+Độ cứng hóa biên & \en{frontier hardening} & Tốc độ năng suất cải tiến trực tiếp suy giảm khi năng lực tiến gần biên nghiên cứu ($\sigma$).\\
+Cận tới hạn / siêu tới hạn & \en{subcritical / supercritical} & Chế độ $\RAI<1$ (hiệu ứng yếu dần) / $\RAI>1$ (hiệu ứng khuếch đại qua các chu kỳ).\\
+Ma trận tái sản xuất & \en{reproduction matrix} & Ma trận $\mathbf{K}$ gồm phản hồi nội bộ và chuyển giao giữa các tác nhân; $\Rnet=\rho(\mathbf{K})$.\\
+Bán kính phổ & \en{spectral radius} & Giá trị riêng có môđun lớn nhất của ma trận, ký hiệu $\rho(\cdot)$.\\
+Quỹ đạo & \en{trajectory} & Chuỗi giá trị năng lực $x(t)$ theo thời gian cho một bộ tham số.\\
+Cửa sổ quan sát sớm & \en{early observation window} & Đoạn đầu của quỹ đạo (vài năm) được dùng để chẩn đoán chế độ, không dùng thông tin tương lai.\\
+Mức đoán lớp đa số & \en{majority-class baseline} & Độ chính xác nếu luôn dự đoán lớp có nhiều mẫu nhất ($63{,}7\%$ ở đây).\\
+\bottomrule
+\end{longtable}
+
+% =====================================================================
+% PHẦN NỘI DUNG (đánh số trang Ả Rập)
+% =====================================================================
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% ---------------------------------------------------------------------
+\chapter{Đặt vấn đề}\label{ch:datvande}
+% ---------------------------------------------------------------------
+\section{Bối cảnh}
+Các hệ thống trí tuệ nhân tạo (AI) ngày càng được dùng ngay trong quy trình nghiên cứu và phát triển (R\&D) tạo ra các hệ AI thế hệ sau: viết và gỡ lỗi mã, đề xuất thí nghiệm, phân tích kết quả, tái hiện bài báo và duy trì công việc kỹ thuật trong thời gian dài hơn~\cite{burtsev2026}. Điều này hình thành một vòng phản hồi: năng lực AI hiện tại ảnh hưởng đến tốc độ tạo ra năng lực AI kế tiếp. Khi vòng phản hồi đủ mạnh, hiện tượng \emph{tự cải tiến đệ quy} (RSI) có thể xuất hiện và làm tiến trình phát triển AI tăng tốc.
+
+\section{Vấn đề nghiên cứu}
+Câu hỏi then chốt là khi nào vòng phản hồi trên chuyển từ \emph{tăng tốc thông thường} sang \emph{tự khuếch đại}. Trực giác phổ biến cho rằng tự khuếch đại xảy ra khi AI đạt một mức năng lực nhất định. Bài báo được chọn~\cite{burtsev2026} đưa ra một quan điểm khác: ranh giới nằm ở \emph{cấu trúc của vòng phản hồi}, cụ thể là so sánh giữa độ mạnh phản hồi đệ quy và tốc độ nghiên cứu ngày càng khó. Bài báo đề xuất đại lượng $\RAI$ để định lượng ranh giới đó.
+
+\section{Mục tiêu và phạm vi của báo cáo}
+Báo cáo thực hiện bốn việc:
+\begin{enumerate}[label=(\roman*)]
+  \item Phân tích bài báo: bài toán, đóng góp, bố cục, mô hình và kịch bản thực nghiệm của tác giả (Chương~\ref{ch:phantich}).
+  \item Tái hiện độc lập các kết quả số của bài báo (kịch bản \emph{giống tác giả}, Mục~\ref{sec:giong}).
+  \item Mở rộng bằng các kỹ thuật khai phá dữ liệu trên tập quỹ đạo sinh từ mô hình: trích đặc trưng, phân lớp và phân cụm các chế độ động học (kịch bản \emph{khác tác giả}, Mục~\ref{sec:khac}).
+  \item Liên hệ với nghiên cứu của nhóm (Chương~\ref{ch:lienhe}).
+\end{enumerate}
+Do bài báo là một mô hình hệ động lực, không có tập dữ liệu ngoài, mọi dữ liệu trong báo cáo là \textbf{dữ liệu tổng hợp} sinh từ chính mô hình. Vì vậy các kết luận của báo cáo chỉ có giá trị trong phạm vi mô hình và không phải dự báo về AI thực tế.
+
+\section{Bố cục báo cáo}
+Chương~\ref{ch:gioithieu} giới thiệu bài báo và tác giả. Chương~\ref{ch:phantich} phân tích nội dung bài báo. Chương~\ref{ch:thucnghiem} trình bày thực nghiệm của nhóm gồm phần mềm, dữ liệu, kịch bản giống và khác tác giả. Chương~\ref{ch:morong} phân tích mở rộng các tài liệu liên quan. Chương~\ref{ch:lienhe} liên hệ với nghiên cứu của nhóm. Phần cuối là kết luận, tài liệu tham khảo và phụ lục hướng dẫn chạy mã nguồn.
+
+% ---------------------------------------------------------------------
+\chapter{Giới thiệu bài báo và tác giả}\label{ch:gioithieu}
+% ---------------------------------------------------------------------
+\section{Thông tin bài báo}
+Bài báo \en{``Recursive Criticality of AI Self-Improvement''} do Mikhail Burtsev (\en{London Institute for Mathematical Sciences}) là tác giả duy nhất, được gửi lên arXiv lúc 18:00 UTC ngày 31/8/2026 (phiên bản v1, 306~KB, chuyên mục cs.AI) với mã 2609.00137 và DOI 10.48550/arXiv.2609.00137~\cite{burtsev2026,arxivabs}. Tác giả đưa bài lên mục \en{Daily Papers} của Hugging Face ngày 2/9/2026~\cite{hfdaily}. Mã nguồn và sổ tay tính toán (\en{Jupyter notebook}) dùng để tái tạo các kết quả số và hình vẽ được công bố cùng bài báo~\cite{burtsevcode}.
+
+\begin{table}[ht]
+\centering
+\caption{Thông tin tóm tắt về bài báo.}\label{tab:thongtinbai}
+\begin{tabular}{@{}p{4.6cm}p{9.2cm}@{}}
+\toprule
+\textbf{Mục} & \textbf{Nội dung}\\
+\midrule
+Tên bài báo & \en{Recursive Criticality of AI Self-Improvement}\\
+Tác giả & Mikhail Burtsev (tác giả duy nhất)\\
+Đơn vị & \en{London Institute for Mathematical Sciences}\\
+Nơi công bố & arXiv:2609.00137v1 [cs.AI], 31/8/2026 (bản tiền ấn phẩm, chưa thấy công bố ở tạp chí hay hội nghị)\\
+Quy mô & 18 trang, 5 hình, 2 bảng\\
+Mã nguồn đi kèm & \url{https://github.com/burtsev/recursive-criticality-ai}\\
+Trích dẫn (Google Scholar) & xem Mục~\ref{sec:scholarbai}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Số lượng tham chiếu trên Google Scholar}\label{sec:scholarbai}
+Google Scholar không cho phép truy cập tự động nên nhóm \textbf{chưa đọc trực tiếp} được số trích dẫn của bài. Vì bài mới đăng khoảng sáu tuần trước ngày tra cứu (12/10/2026) nên số trích dẫn được kỳ vọng rất thấp. Một trang tổng hợp bên thứ ba (\en{awesomepapers.io}) hiển thị 0 trích dẫn~\cite{awesome}, nhưng đây không phải số liệu của Google Scholar nên chỉ mang tính tham khảo. Nhóm cũng không tìm thấy bài báo học thuật nào trích dẫn bài này (xem Mục~\ref{sec:citing}).
+\todo{Mở Google Scholar, tìm đúng tiêu đề bài báo, ghi số ``Cited by'' và ngày truy cập vào đây}
+
+\section{Công bố khoa học của tác giả}
+Bài báo chỉ có một tác giả nên không cần áp dụng quy tắc chọn tác giả thứ nhất, thứ hai và cuối.
+
+\subsection{Nhận diện tác giả}
+Mikhail S. Burtsev là \en{Landau AI Fellow} tại \en{London Institute for Mathematical Sciences} (LIMS), theo trang cá nhân của viện~\cite{lims}. Ông học vi điện tử tại Học viện Năng lượng Moskva, lấy tiến sĩ khoa học máy tính tại Viện Toán ứng dụng Keldysh (năm 2005 theo \en{Mathematics Genealogy Project}~\cite{mgp}), từng giữ chức vụ nghiên cứu cấp cao tại Viện Sinh lý học Anokhin và Trung tâm Kurchatov, là Giám đốc khoa học của Viện Nghiên cứu Trí tuệ nhân tạo (Moskva) và trưởng phòng thí nghiệm \en{Neural Networks and Deep Learning} tại Viện Vật lý và Công nghệ Moskva (MIPT), nơi nhóm phát triển khung hội thoại nguồn mở DeepPavlov~\cite{lims}. Hướng nghiên cứu hiện nay gồm toán học đằng sau AI thông minh hơn, học liên tục, mạng nơ-ron tăng cường bộ nhớ và toán học có AI hỗ trợ~\cite{lims}. Cần lưu ý có người trùng tên (vận động viên đấu kiếm Mikhail Burtsev, 1956--2015) không liên quan; khi đối chiếu hồ sơ phải dựa vào đơn vị công tác và lĩnh vực.
+
+\subsection{Trên DBLP}
+Hồ sơ DBLP của tác giả là \en{``Mikhail Burtsev 0001''} (mã 85/5425), gắn với LIMS, Viện Nghiên cứu AI Moskva và MIPT~\cite{dblp}. Theo bản lưu của trang (cập nhật ngày 2/7/2025), hồ sơ có \textbf{66 bản ghi} trong giai đoạn 2001--2025: 5 bài tạp chí, 28 bài hội nghị/hội thảo, 1 tập kỷ yếu do ông biên tập và 32 bản tiền ấn phẩm (CoRR). Vì trang được cập nhật trước 2026 nên không chứa các công bố mới, kể cả bài đang phân tích. Một số công bố tiêu biểu: \en{DeepPavlov: Open-Source Library for Dialogue Systems} (ACL 2018, phiên trình diễn); \en{Recurrent Memory Transformer} (NeurIPS 2022); \en{Beyond Attention: Breaking the Limits of Transformer Context Length with Recurrent Memory} (AAAI 2024); \en{BABILong} (NeurIPS 2024).
+
+\subsection{Trên Scopus}
+Scopus yêu cầu đăng nhập qua tổ chức nên nhóm không tra được số liệu từ bên ngoài. 
+\todo{Tra Scopus qua thư viện trường: tìm tác giả ``Burtsev, Mikhail S.'' (đơn vị LIMS hoặc MIPT), ghi số tài liệu, số trích dẫn, chỉ số h và ngày truy cập; lưu ý Scopus có thể tách hồ sơ thành nhiều mã tác giả}
+
+\subsection{Trên Google Scholar}
+Hồ sơ Google Scholar của tác giả (mã người dùng \texttt{t\_PLQakAAAAJ}) liệt kê đơn vị là LIMS và \en{Royal Institution}~\cite{scholarprofile}. Do Google Scholar chặn truy cập tự động, nhóm lấy số liệu qua trang hồ sơ của alphaXiv vốn đồng bộ từ Google Scholar~\cite{alphaxiv}: 159 bài, \textbf{4\,287 trích dẫn}, chỉ số $h=27$, $i10=59$ và 920 trích dẫn trong năm 2026. Số liệu của bản sao có thể chậm so với Google Scholar (số trích dẫn từng bài ở hai nguồn lệch nhau vài đơn vị). Các bài nhiều trích dẫn nhất gồm \en{The Second Conversational Intelligence Challenge (ConvAI2)} (2019, 501), \en{Recurrent Memory Transformer} (NeurIPS 2022, 398), \en{BABILong} (NeurIPS 2024, 302), \en{DeepPavlov} (ACL 2018, 288) và \en{GENA-LM} (\en{Nucleic Acids Research} 2025, 222).
+
+\begin{table}[ht]
+\centering
+\caption{Chỉ số công bố của tác giả (tra cứu ngày 12/10/2026).}\label{tab:tacgia}
+\begin{tabular}{@{}p{3.2cm}p{7.4cm}p{3.2cm}@{}}
+\toprule
+\textbf{Cơ sở dữ liệu} & \textbf{Số liệu} & \textbf{Nguồn}\\
+\midrule
+DBLP & 66 bản ghi (5 tạp chí, 28 hội nghị, 1 biên tập, 32 tiền ấn phẩm); trang cập nhật 2/7/2025 & \cite{dblp}\\
+Google Scholar & 159 bài; 4\,287 trích dẫn; $h=27$; $i10=59$ (qua bản sao alphaXiv) & \cite{alphaxiv}\\
+Scopus & \todo{số tài liệu / trích dẫn / chỉ số h} & --\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ---------------------------------------------------------------------
+\chapter{Phân tích nội dung bài báo}\label{ch:phantich}
+% ---------------------------------------------------------------------
+\section{Phát biểu bài toán}\label{sec:baitoan}
+Bài báo xem tự cải tiến đệ quy là tính chất của một \emph{hệ AI--R\&D} (gồm mô hình AI dùng trong nghiên cứu, nhà nghiên cứu, hạ tầng tính toán, quy trình đánh giá và triển khai) chứ không phải của một tác tử tự trị đơn lẻ~\cite{burtsev2026}. Ba câu hỏi được đặt ra:
+\begin{enumerate}[label=(\arabic*)]
+  \item Điều kiện nào khiến sự hỗ trợ của AI cho R\&D chuyển từ tăng tốc thông thường sang chế độ tự khuếch đại?
+  \item Độ trễ phản hồi và sự cứng hóa của biên nghiên cứu quyết định thế nào việc chế độ đó chỉ gây dịch chuyển nhỏ tạm thời hay nén mạnh quá trình chuyển từ AGI sang ASI?
+  \item Giới hạn tài nguyên vật lý, cạnh tranh và hợp tác giữa các tác nhân nghiên cứu làm thay đổi động học này ra sao?
+\end{enumerate}
+
+\section{Đóng góp chính}\label{sec:donggop}
+Bài báo nêu bốn đóng góp:
+\begin{enumerate}[label=(\arabic*)]
+  \item Mô hình hóa RSI như một \emph{chuyển pha ổn định cục bộ} và đưa ra số tái sản xuất đệ quy $\RAI=\chi a/\sigma$. Trong mô hình tối giản, ngưỡng này không phụ thuộc năng suất nghiên cứu nền, nên tiến bộ nhanh và tự khuếch đại là hai hiện tượng khác nhau; hệ có thể trở nên siêu tới hạn trước khi tăng tốc lộ rõ.
+  \item Đặc trưng hóa thời lượng và cường độ khuếch đại theo độ trễ và biên nghiên cứu: ở thông lượng cao, chu kỳ phát triển thế hệ kế tiếp là thang thời gian giới hạn; độ cứng hóa biên có thể đưa hệ siêu tới hạn trở về cận tới hạn, nên khuếch đại mạnh nhưng \emph{tạm thời} trong một mô hình nghiên cứu cố định.
+  \item Tách chế độ đệ quy khỏi quy mô nghiên cứu và ràng buộc hạ tầng vật lý: thêm tính toán hay nhân lực làm tiến bộ nhanh hơn nhưng không đổi việc hệ có siêu tới hạn hay không.
+  \item Mở rộng sang nhiều tác nhân: tính tới hạn của cả hệ sinh thái do bán kính phổ của ma trận tái sản xuất quyết định, nên hệ có thể siêu tới hạn dù từng tác nhân đều cận tới hạn.
+\end{enumerate}
+
+\section{Bố cục bài báo}\label{sec:bocuc}
+Bài báo gồm năm mục: (1) Giới thiệu; (2) Mô hình động lực của tự cải tiến đệ quy (vòng đệ quy, mô hình có trễ, ``đường băng đệ quy hữu hạn'', hệ sinh thái nhiều tác nhân); (3) Các kịch bản tham chiếu (tham số hóa không đệ quy, tham số hóa phần đệ quy, các chế độ động học); (4) Các kịch bản chiến lược (cạnh tranh và tổ chức mạng, giới hạn phần cứng và điện năng); (5) Kết luận.
+
+\section{Mô hình và phương pháp}\label{sec:mohinh}
+\subsection{Biến trạng thái và vòng đệ quy}
+Gọi $x(t)$ là năng lực AI. Bài báo đo $x$ bằng mức cải thiện chi phí tài nguyên tối thiểu để hoàn thành các tác vụ $q\in Q$ ở cùng mức sai số $\epsilon$ và cùng bảng giá $p$:
+\begin{equation}
+  x(t) = \int_{Q} \phi(q)\,\ln\frac{c_{t_0}(q,\epsilon;p)}{c_{t}(q,\epsilon;p)}\,\dd\mu(q),
+  \label{eq:x}
+\end{equation}
+với $\phi(q)$ là trọng số của tác vụ. Vòng đệ quy gồm bốn thành phần: (i) năng suất nghiên cứu nền $r(t)$; (ii) độ lợi đệ quy $a(x,t)$ với độ trễ đầu-cuối $\tau(t)$; (iii) đóng vận hành $\chi(x,t)\in[0,1]$, là tỷ lệ độ lợi sống sót qua toàn bộ quy trình phát triển; (iv) độ cứng hóa biên $\sigma(x)$. Độ lợi thực hiện được là
+\begin{equation}
+  g(x,t) = \chi(x,t)\,a(x,t).
+  \label{eq:g}
+\end{equation}
+
+\subsection{Mô hình có trễ và số tái sản xuất đệ quy}
+Năng lực tiến triển theo phương trình vi phân có trễ (DDE)
+\begin{equation}
+  \dot{x}(t) = r(t)\, f\!\left[x(t)\right] \exp\!\Big(\Phi\big(x[t-\tau(t)],\,t\big)\Big),
+  \label{eq:chinh}
+\end{equation}
+trong đó $f(x)>0$ là năng suất cải tiến trực tiếp và thế phản hồi $\Phi$ thỏa $\partial\Phi/\partial x=g$. Độ cứng hóa biên được định nghĩa bởi
+\begin{equation}
+  \sigma(x) = -\frac{\dd \ln f(x)}{\dd x}.
+  \label{eq:sigma}
+\end{equation}
+Tuyến tính hóa quanh một quỹ đạo tham chiếu với vận tốc $v=\dot{\bar{x}}>0$ cho nhiễu loạn $\xi$ thỏa
+\begin{equation}
+  \dot{\xi}(t) = -v\sigma\,\xi(t) + v g\,\xi(t-\tau),
+  \qquad \lambda + v\sigma = v g\, e^{-\lambda\tau},
+  \label{eq:dactrung}
+\end{equation}
+với phương trình đặc trưng ở vế phải. Số tái sản xuất đệ quy được định nghĩa là
+\begin{equation}
+  \RAI = \frac{g}{\sigma} = \frac{\chi\, a}{\sigma}.
+  \label{eq:rai}
+\end{equation}
+
+\begin{menhde}[Tính tới hạn đệ quy cục bộ]\label{mh:1}
+Với $v>0$, $\sigma>0$, $g\ge 0$, $\tau\ge 0$: mọi nghiệm đặc trưng của~\eqref{eq:dactrung} có phần thực âm khi $\RAI<1$; $\lambda=0$ là nghiệm khi $\RAI=1$; tồn tại nghiệm thực dương khi $\RAI>1$.
+\end{menhde}
+Gần ngưỡng, nghiệm trội xấp xỉ $\lambda^{*}\simeq v\sigma(\RAI-1)/(1+v\sigma\RAI\tau)$, và khi thông lượng rất cao ($v\sigma\tau\to\infty$) thì $\lambda^{*}\to \ln\RAI/\tau$. Hệ quả là: tăng $r$ (nên tăng $v$) làm hệ khuếch đại nhanh hơn nhưng không đổi dấu của $\RAI-1$, và độ trễ $\tau$ là giới hạn tốc độ khuếch đại. Cần lưu ý kết luận $\RAI>1$ chỉ có nghĩa là nhiễu loạn nhỏ được khuếch đại cục bộ, không suy ra tăng trưởng vô hạn.
+
+\subsection{Biên nghiên cứu hữu hạn}
+Với $f(x)=(1-x/X)^{\beta}$, ta có
+\begin{equation}
+  \sigma(x)=\frac{\beta}{X-x}.
+  \label{eq:bienhuuhan}
+\end{equation}
+\begin{menhde}[Kết thúc ở biên hữu hạn]\label{mh:2}
+Nếu $x(t)\to X<\infty$, $\sigma[x(t)]\to\infty$ và $g[x(t)]$ bị chặn thì $\RAI\to 0$: hệ trở lại cận tới hạn khi đủ gần biên.
+\end{menhde}
+Do đó khuếch đại có thể mạnh nhưng chỉ tạm thời trong một mô hình nghiên cứu cố định; một đột phá khoa học có thể nâng $X$ và mở ra giai đoạn khuếch đại mới.
+
+\subsection{Hệ sinh thái nhiều tác nhân}
+Với $n$ tác nhân, nhiễu loạn $\xi_i$ thỏa
+\begin{equation}
+  \dot{\xi}_i(t) = -v_i\sigma_i\,\xi_i(t) + v_i\sum_{j=1}^{n} g_{ij}\,\xi_j(t-\tau_{ij}),
+  \label{eq:nhieu}
+\end{equation}
+với $g_{ii}$ là độ lợi nội bộ và $g_{ij}$ là mức chuyển giao từ $j$ sang $i$. Chuẩn hóa theo độ cứng hóa của tác nhân nhận cho ma trận tái sản xuất
+\begin{equation}
+  K_{ij}=\frac{g_{ij}}{\sigma_i},\qquad \Rnet=\rho(\mathbf{K}).
+  \label{eq:K}
+\end{equation}
+\begin{menhde}[Tính tới hạn tập thể]\label{mh:3}
+Với hệ không trễ tương ứng của~\eqref{eq:nhieu}, hệ ổn định cục bộ khi $\rho(\mathbf{K})<1$ và mất ổn định khi $\rho(\mathbf{K})>1$. Do đó $K_{ii}<1$ với mọi $i$ chưa đủ để bảo đảm ổn định nếu chuyển giao giữa các tác nhân đủ mạnh.
+\end{menhde}
+
+\subsection{Giới hạn hạ tầng vật lý}
+Gọi $C_{\mathrm{phys}}(t)$ là năng lực tính toán hiệu dụng mà hạ tầng hỗ trợ, và $C_{\mathrm{req}}(x)$ là tính toán cần để hiện thực năng lực $x$. Khả năng triển khai đòi hỏi $C_{\mathrm{req}}[x(t)]\le C_{\mathrm{phys}}(t)$. Bài báo xấp xỉ $C_{\mathrm{req}}(x)=C_{\mathrm{req}}(x_{\mathrm{AGI}})e^{\kappa(x-x_{\mathrm{AGI}})}$ và định nghĩa độ dư vật lý tại thời điểm đạt AGI không ràng buộc là $F^{\mathrm{soft}}_{\mathrm{AGI}}=C_{\mathrm{phys}}(T^{\mathrm{soft}}_{\mathrm{AGI}})/C_{\mathrm{req}}(x_{\mathrm{AGI}})$. Ràng buộc này giới hạn năng lực \emph{triển khai được} mà không trực tiếp đổi $\RAI$.
+
+\section{Dữ liệu, công cụ và kịch bản thực nghiệm của tác giả}\label{sec:kichban_tg}
+\subsection{Dữ liệu}
+Bài báo \textbf{không dùng tập dữ liệu ngoài}. Mọi kết quả số được sinh từ mô hình và được tác giả nhấn mạnh là minh họa có điều kiện, không phải dự báo xác suất~\cite{burtsev2026}. Chỉ có hai đại lượng được hiệu chỉnh theo dữ liệu bên ngoài: thang thời gian không đệ quy $r_{\mathrm{ref}}=1/24$ năm$^{-1}$ (đặt mốc AGI không đệ quy vào năm 2050 dựa trên các khảo sát chuyên gia~\cite{grace2025}) và độ trễ $\tau=0{,}5$ năm. Các tham số $a$, $\beta$, $k$ chưa có ước lượng thực nghiệm và được chọn để trải qua các chế độ khác nhau.
+
+\subsection{Công cụ}
+Mã tái tạo kết quả là một sổ tay Jupyter bằng Python, dùng các thư viện NumPy, SciPy, pandas, Matplotlib, NetworkX và tqdm~\cite{burtsevcode}.
+
+\subsection{Kịch bản}
+\begin{itemize}
+  \item \textbf{Tham chiếu không đệ quy:} chuẩn hóa $x_0=0$, $X=1$, $\beta=2$, nên $\dot{x}=r_{\mathrm{ref}}(1-x)^2$ có nghiệm $x(t)=r_{\mathrm{ref}}t/(1+r_{\mathrm{ref}}t)$ và thời điểm đạt ngưỡng $T(x)=x/[r_{\mathrm{ref}}(1-x)]$. Với $x_{\mathrm{AGI}}=0{,}5$ và $x_{\mathrm{ASI}}=0{,}8$: $T_{\mathrm{AGI}}=24$ năm, $T_{\mathrm{ASI}}=96$ năm.
+  \item \textbf{Bốn kịch bản đệ quy:} chỉ thay đổi độ lợi $a\in\{0{,}5;3;6;15\}$ với $\tau=0{,}5$ năm, $\beta=2$, và đóng vận hành $\chi(x)=1/(1+e^{-kx})$, $k=10$. Số tái sản xuất cục bộ là $\RAI(x)=a\chi(x)(1-x)/\beta$ và $\RAI^{\mathrm{peak}}=\max_x\RAI(x)$.
+  \item \textbf{Ba cấu hình mạng nhiều tác nhân} (phòng lab đóng, hệ sinh thái mở, cạnh tranh toàn cầu), xuất phát từ kịch bản siêu tới hạn yếu ($a=3$).
+  \item \textbf{Giới hạn hạ tầng:} $Q=e^{\kappa(x_{\mathrm{ASI}}-x_{\mathrm{AGI}})}=100$, tốc độ tăng tính toán vật lý $g_{\mathrm{phys}}=0{,}25$ năm$^{-1}$, và $F^{\mathrm{soft}}_{\mathrm{AGI}}\in\{8;2;0{,}75\}$.
+\end{itemize}
+
+\section{Nhận xét và hạn chế của bài báo}\label{sec:nhanxet}
+\begin{itemize}
+  \item Phân tích ổn định là \emph{cục bộ} (tuyến tính hóa), nên $\RAI>1$ không bảo đảm bùng nổ vô hạn; tác giả cũng nêu điều này.
+  \item Các tham số $a$, $\beta$, $k$ và vị trí các ngưỡng $x_{\mathrm{AGI}}$, $x_{\mathrm{ASI}}$ chưa được ràng buộc bởi dữ liệu, nên các mốc thời gian chỉ là đầu ra có điều kiện.
+  \item Kết luận ``năng suất nền không đổi ngưỡng tới hạn'' đúng trong \emph{mô hình tối giản}.
+  \item Mệnh đề~\ref{mh:3} được phát biểu cho hệ không trễ.
+  \item Điều kiện ngưỡng bằng~1 cũng được Cunningham và cộng sự~\cite{cunningham2026} suy ra độc lập từ các độ co giãn kinh tế; điểm khác là bài báo này xét ổn định của nhiễu loạn quanh quỹ đạo có trễ.
+  \item Phiên bản v1 có vài lỗi in: ở phần Giới thiệu có câu ``khi $\RAI>1$ thì hiệu ứng yếu dần'' (đúng phải là $\RAI<1$), và ở Kết luận công thức ghi $\RAI=\chi/a\sigma$ (đúng phải là $\chi a/\sigma$ như~\eqref{eq:rai}).
+\end{itemize}
+
+% ---------------------------------------------------------------------
+\chapter{Thực nghiệm của nhóm}\label{ch:thucnghiem}
+% ---------------------------------------------------------------------
+\section{Phần mềm và dữ liệu}
+\subsection{Phần mềm}
+Phần mềm của tác giả bài báo là sổ tay Jupyter tại~\cite{burtsevcode}; nhóm dùng nó làm chuẩn đối chiếu. Nhóm tự cài đặt lại mô hình bằng Python~3 với các thư viện NumPy, SciPy, pandas, Matplotlib và scikit-learn~\cite{pedregosa2011}. Mã của nhóm gồm năm tệp chính (Bảng~\ref{tab:mamgu}); cách chạy được mô tả ở Phụ lục~\ref{app:ma}. Địa chỉ công bố mã và dữ liệu của nhóm: \todo{URL kho mã GitHub của nhóm}.
+
+\begin{table}[ht]
+\centering
+\caption{Các tệp mã nguồn của nhóm.}\label{tab:mamgu}
+\begin{tabular}{@{}p{3.6cm}p{10.2cm}@{}}
+\toprule
+\textbf{Tệp} & \textbf{Chức năng}\\
+\midrule
+\code{rsi\_model.py} & Mô hình DDE~\eqref{eq:chinh} cho một tác nhân (tích phân Heun bậc 2), $\RAI(x)$, thời điểm đạt ngưỡng.\\
+\code{rsi\_network.py} & Mô hình mạng nhiều tác nhân (Mục~\ref{sec:giong}), $\Rnet(t)$.\\
+\code{rsi\_dataset.py} & Sinh tập quỹ đạo theo lô (vector hóa) và nhãn $\RAI^{\mathrm{peak}}$.\\
+\code{run\_all.py} & Chạy toàn bộ thực nghiệm, ghi CSV vào \code{data/} và hình vào \code{figures/}.\\
+\code{run\_noise.py} & Kịch bản có nhiễu quan sát (Mục~\ref{sec:nhieu}), ghi \code{data/ket\_qua\_co\_nhieu.csv}.\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Dữ liệu}
+Dữ liệu của nhóm là \textbf{tập quỹ đạo tổng hợp} sinh từ mô hình~\eqref{eq:chinh}. Mỗi bản ghi là một quỹ đạo $x(t)$ trên 60 năm với bước 0,01 năm (6001 điểm), ứng với một bộ tham số lấy ngẫu nhiên (hạt giống 0) theo Bảng~\ref{tab:thamso}.
+
+\begin{table}[ht]
+\centering
+\caption{Mô tả tập dữ liệu tổng hợp: 4000 bản ghi (quỹ đạo), mỗi bản ghi 6001 điểm.}\label{tab:thamso}
+\begin{tabular}{@{}lcl@{}}
+\toprule
+\textbf{Tham số} & \textbf{Khoảng} & \textbf{Phân phối}\\
+\midrule
+Độ lợi đệ quy $a$ & $[0{,}1;\,20]$ & đều theo thang log\\
+Mũ cứng hóa biên $\beta$ & $[0{,}5;\,4]$ & đều\\
+Độ dốc đóng vận hành $k$ & $[2;\,20]$ & đều\\
+Độ trễ $\tau$ (năm) & $[0{,}1;\,2]$ & đều\\
+Hệ số nỗ lực nghiên cứu $m_r$ ($r=m_r r_{\mathrm{ref}}$) & $[0{,}5;\,2]$ & đều theo thang log\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Nhãn.} Mỗi quỹ đạo được gán nhãn theo $\RAI^{\mathrm{peak}}=\max_{0\le x<1}a\chi(x)(1-x)/\beta$: bài toán \emph{2 lớp} là cận tới hạn ($\RAI^{\mathrm{peak}}\le 1$, $63{,}7\%$) và siêu tới hạn ($>1$, $36{,}3\%$); bài toán \emph{3 lớp} tách siêu tới hạn thành yếu ($1<\RAI^{\mathrm{peak}}\le 2$, $13{,}4\%$) và mạnh ($>2$, $22{,}9\%$). Nhãn chỉ dùng để đánh giá, không đưa vào đặc trưng.
+
+\textbf{Đặc trưng.} Từ mỗi quỹ đạo, nhóm trích 10 đặc trưng (Bảng~\ref{tab:dactrung}), chia thành ba nhóm: độ dốc, mốc thời gian và hình dạng.
+
+\begin{table}[ht]
+\centering
+\caption{Mười đặc trưng trích từ mỗi quỹ đạo ($v=\dot{x}$; $T_y$ là thời điểm đầu tiên $x\ge y$).}\label{tab:dactrung}
+\begin{tabular}{@{}llp{7.4cm}@{}}
+\toprule
+\textbf{Nhóm} & \textbf{Đặc trưng} & \textbf{Định nghĩa}\\
+\midrule
+Độ dốc & \code{v\_dau}, \code{v\_max} & Độ dốc trung bình 2 năm đầu; tốc độ lớn nhất.\\
+Mốc thời gian & $T_{25},T_{50},T_{80}$ & Thời điểm đạt $x=0{,}25;\,0{,}5;\,0{,}8$.\\
+Hình dạng & \code{gia\_toc\_som} & $[v(3)-v(0{,}5)]/v(0{,}5)$.\\
+ & \code{v\_max\_tren\_v\_dau}, \code{t\_v\_max} & Tỷ số $v_{\max}$ trên độ dốc đầu; thời điểm đạt $v_{\max}$.\\
+ & \code{T80\_tren\_T50}, \code{T50\_tren\_T25} & Các tỷ số giữa mốc thời gian.\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Dữ liệu được ghi ở \code{data/tham\_so.csv} (tham số, 4000 dòng) và \code{data/dac\_trung.csv} (đặc trưng và nhãn); địa chỉ công bố: \todo{URL kho dữ liệu của nhóm}. Do dữ liệu sinh bằng mã có hạt giống cố định nên có thể tái tạo chính xác.
+
+\section{Kịch bản giống tác giả}\label{sec:giong}
+\subsection{Bốn kịch bản đệ quy}
+Nhóm cài đặt~\eqref{eq:chinh} với $\Phi(x)=(a/k)\,[\ln(1+e^{kx})-\ln 2]$ (nguyên hàm của $a\chi(x)$ với $\Phi(0)=0$), tích phân bằng phương pháp Heun bậc 2 với bước 0,0005 năm và lịch sử $x=0$ trước $t=0$. Bảng~\ref{tab:bang1} cho thấy thời điểm đạt ngưỡng trùng với Table~1 của bài báo (sai khác lớn nhất $0{,}005$ năm, do làm tròn đến hai chữ số thập phân).
+
+\begin{table}[ht]
+\centering
+\caption{Thời điểm đạt ngưỡng của bốn kịch bản tham chiếu (đơn vị: năm). Kết quả của nhóm trùng với Table~1 của bài báo.}\label{tab:bang1}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Kịch bản} & $a$ & $T_{\mathrm{AGI}}$ & $T_{\mathrm{ASI}}$ & $\Delta T_{\mathrm{AGI}\to\mathrm{ASI}}$\\
+\midrule
+Không đệ quy        & 0   & 24,00 & 96,00 & 72,00\\
+Tăng trưởng mượt    & 0,5 & 21,35 & 74,13 & 52,79\\
+Siêu tới hạn yếu    & 3   & 12,90 & 24,73 & 11,83\\
+Bùng nổ tạm thời    & 6   & 8,40  & 11,08 & 2,69\\
+Chuyển pha nhanh    & 15  & 4,50  & 4,95  & 0,45\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{fig3_vi.pdf}
+\caption{Quỹ đạo năng lực (a) và số tái sản xuất đệ quy (b) của bốn kịch bản tham chiếu; vẽ lại theo Fig.~3 của bài báo với nhãn tiếng Việt.}\label{fig:fig3}
+\end{figure}
+
+Hình~\ref{fig:fig3} cho thấy bốn chế độ: ở kịch bản $a=0{,}5$, $\RAI<1$ suốt quỹ đạo nhưng hai mốc vẫn đến sớm hơn mức không đệ quy (AGI sớm khoảng 2,7 năm, ASI sớm khoảng 22 năm). Ở $a=3$, $\RAI$ chỉ vượt 1 chút rồi giảm, nhưng quỹ đạo vẫn ở mức vượt trước bền vững. Ở $a=15$, hai mốc cách nhau chưa đầy nửa năm (so với 72 năm khi không đệ quy), rồi $\RAI$ rơi về 0 khi tiến gần biên.
+
+\subsection{Ba mạng nhiều tác nhân}
+Bài báo chỉ nêu dạng tuyến tính hóa~\eqref{eq:nhieu}, còn phương trình phi tuyến dùng để mô phỏng được lấy từ mã nguồn của tác giả~\cite{burtsevcode}. Với tác nhân $i$ (có $n=3$ tác nhân):
+\begin{equation}
+  \dot{x}_i(t)=m_r\, r_{\mathrm{ref}}\,(1-x_i)^{\beta}\exp(\varphi_i),\qquad
+  \boldsymbol{\varphi}=\mathbf{B}\,\mathbf{P}\big(\mathbf{x}(t-\tau)\big),\quad
+  \mathbf{B}=\frac{\sigma^{*}}{g^{*}}\mathbf{K},
+  \label{eq:mang}
+\end{equation}
+trong đó $P(x)=(a/k)\ln\!\big[(1+e^{kx})/2\big]$, $\sigma^{*}=\beta/(X-x_0)=2$ và $g^{*}=a\chi(0)=1{,}5$ là các giá trị tại trạng thái tham chiếu của kịch bản $a=3$. Số tái sản xuất mạng theo thời gian là $\Rnet(t)=\rho(\mathbf{M}(t))$ với $M_{ij}=B_{ij}\,g(x_j)/\sigma_i(x_i)$, và tại $t=0$ thì $\mathbf{M}=\mathbf{K}$. Nhóm tích phân bằng Runge--Kutta bậc 4 (bước 0,005 năm), nội suy tuyến tính cho giá trị trễ, theo cách của notebook. Bảng~\ref{tab:bang2} cho thấy kết quả trùng với Table~2 của bài báo.
+
+\begin{table}[ht]
+\centering
+\caption{Ba cấu hình mạng: thời điểm đạt ngưỡng đầu tiên của các tác nhân (năm); kết quả của nhóm trùng với Table~2 của bài báo.}\label{tab:bang2}
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+\textbf{Cấu hình} & $\rho(\mathbf{K})$ & $m_r$ & $\tau$ & $T_{\mathrm{AGI}}$ & $T_{\mathrm{ASI}}$ & $\Delta T$\\
+\midrule
+Phòng lab đóng      & 1,01 & 1,0 & 0,30 & 10,40 & 16,53 & 6,13\\
+Hệ sinh thái mở     & 1,55 & 0,8 & 0,50 & 9,75  & 12,58 & 2,82\\
+Cạnh tranh toàn cầu & 1,15 & 1,2 & 1,00 & 8,97  & 13,42 & 4,45\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{fig4_vi.pdf}
+\caption{Quỹ đạo năng lực (hàng trên) và số tái sản xuất (hàng dưới) của ba cấu hình mạng; đường đứt nét đen là $\Rnet(t)$, đường màu là $\RAI$ cục bộ của từng tác nhân. Vẽ lại theo Fig.~4b của bài báo.}\label{fig:fig4}
+\end{figure}
+
+Trong cấu hình hệ sinh thái mở (Hình~\ref{fig:fig4}), cả ba tác nhân đều có $\RAI<1$ ($K_{ii}\le 0{,}65$) nhưng $\Rnet$ đạt đỉnh khoảng $2{,}19$ quanh năm 2031, và đây là cấu hình có khoảng AGI$\to$ASI ngắn nhất (2,82 năm) dù nỗ lực nghiên cứu thấp hơn ($m_r=0{,}8$). Đây là minh họa trực tiếp của Mệnh đề~\ref{mh:3}. Hai cấu hình còn lại có $\Rnet$ đỉnh khoảng $1{,}42$ (phòng lab đóng) và $1{,}63$ (cạnh tranh toàn cầu).
+
+\textbf{Phạm vi.} Nhóm chưa tái hiện Fig.~5 (giới hạn hạ tầng) vì nằm ngoài trọng tâm khai phá dữ liệu; mục này có thể bổ sung nếu cần.
+
+\section{Kịch bản khác tác giả}\label{sec:khac}
+Bài báo kết luận rằng chỉ nhìn độ dốc của đường cong năng lực thì không phân biệt được tự khuếch đại với tiến bộ nhanh do nguồn khác. Nhóm kiểm tra luận điểm này bằng khai phá dữ liệu trên tập quỹ đạo ở Mục~4.1.2, đặt hai câu hỏi: (a) có phân biệt được chế độ cận/siêu tới hạn từ hình dạng quỹ đạo không, và (b) có làm được điều đó chỉ từ một cửa sổ quan sát sớm không.
+
+\subsection{Phương pháp}
+Bộ phân lớp là rừng ngẫu nhiên (RF, 300 cây)~\cite{breiman2001} đánh giá bằng kiểm định chéo phân tầng 5 lớp; chỉ số chính là độ chính xác (\en{accuracy}) và độ chính xác cân bằng. Mức tham chiếu là đoán lớp đa số ($63{,}7\%$ ở bài toán 2 lớp). Phân cụm không giám sát dùng K-means trên đặc trưng đã lấy logarit và chuẩn hóa, đánh giá bằng chỉ số Rand điều chỉnh (ARI)~\cite{hubert1985}. Thí nghiệm gồm hai phần:
+\begin{enumerate}[label=(\alph*)]
+  \item \textbf{Toàn bộ quỹ đạo:} so sánh các bộ đặc trưng ``chỉ độ dốc'', ``chỉ mốc thời gian'', ``hình dạng'' và ``tất cả''.
+  \item \textbf{Cửa sổ quan sát sớm:} chỉ dùng $W\in\{2,3,5,8,12\}$ năm đầu. Bộ ``độ dốc'' là độ dốc trung bình trong cửa sổ; bộ ``hình dạng'' gồm gia tốc tương đối, tốc độ tăng của $\ln v$ và độ cong của quỹ đạo trong cửa sổ.
+\end{enumerate}
+Phần (b) là kiểm tra công bằng hơn, vì ở (a) đặc trưng $v_{\max}$ dùng cả thông tin tương lai, trong khi luận điểm của bài báo nói về giai đoạn \emph{trước khi} thấy tăng tốc.
+
+\subsection{Kết quả}
+\textbf{Toàn bộ quỹ đạo.} Bảng~\ref{tab:fulltraj} cho thấy mọi bộ đặc trưng đều vượt xa mức đoán đa số, và bộ ``hình dạng'' đạt $99{,}4\%$ (2 lớp). Tuy nhiên bộ ``chỉ độ dốc'' cũng đạt $92{,}3\%$ vì $v_{\max}$ có tương quan Spearman $0{,}59$ với $\RAI^{\mathrm{peak}}$ (các quỹ đạo siêu tới hạn mạnh thường đạt tốc độ cực đại cao). Do $v_{\max}$ phụ thuộc vào tương lai nên nhóm không rút ra kết luận về độ dốc từ phần này.
+
+\begin{table}[ht]
+\centering
+\caption{Độ chính xác (độ chính xác cân bằng) của RF trên toàn bộ quỹ đạo, kiểm định chéo 5 lớp, đơn vị \%.}\label{tab:fulltraj}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Bộ đặc trưng} & \textbf{Số đặc trưng} & \textbf{2 lớp} & \textbf{3 lớp}\\
+\midrule
+Chỉ độ dốc        & 2  & 92,3 (89,8) & 89,5 (76,8)\\
+Chỉ mốc thời gian & 3  & 97,4 (97,0) & 94,6 (89,8)\\
+Hình dạng         & 5  & 99,4 (99,2) & 98,0 (96,2)\\
+Tất cả đặc trưng  & 10 & 99,3 (99,2) & 97,8 (95,5)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Cửa sổ quan sát sớm.} Bảng~\ref{tab:early} và Hình~\ref{fig:khaipha}a cho thấy với cửa sổ ngắn, bộ ``độ dốc'' chỉ đạt $55{,}8\%$ ($W=2$) và $62{,}7\%$ ($W=5$), tức xấp xỉ hoặc thấp hơn mức đoán đa số $63{,}7\%$, trong khi bộ ``hình dạng'' đã đạt $87{,}2\%$ ở $W=2$ và $95{,}7\%$ ở $W=5$. Độ dốc chỉ trở nên hữu ích khi cửa sổ dài ($80{,}0\%$ ở $W=12$), tức khi quỹ đạo đã đủ lộ rõ.
+
+\begin{table}[ht]
+\centering
+\caption{Độ chính xác (độ chính xác cân bằng) của RF theo độ dài cửa sổ quan sát sớm, bài toán 2 lớp, đơn vị \%. Mức đoán lớp đa số: $63{,}7\%$.}\label{tab:early}
+\begin{tabular}{@{}cccc@{}}
+\toprule
+\textbf{Cửa sổ $W$ (năm)} & \textbf{Độ dốc} & \textbf{Hình dạng} & \textbf{Độ dốc + hình dạng}\\
+\midrule
+2  & 55,8 (51,9) & 87,2 (84,9) & 91,8 (89,9)\\
+3  & 57,0 (53,5) & 94,0 (92,9) & 95,4 (94,5)\\
+5  & 62,7 (59,7) & 95,7 (94,9) & 96,2 (95,4)\\
+8  & 71,8 (69,7) & 97,4 (96,9) & 98,2 (97,8)\\
+12 & 80,0 (78,1) & 96,9 (96,1) & 98,4 (98,1)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{fig_khai_pha_vi.pdf}
+\caption{(a) Độ chính xác chẩn đoán chế độ theo độ dài cửa sổ quan sát sớm. (b) Độ dốc trung bình 2 năm đầu theo hệ số nỗ lực nghiên cứu $m_r$ (thang log), tô màu theo chế độ.}\label{fig:khaipha}
+\end{figure}
+
+\textbf{Cơ chế.} Độ dốc 2 năm đầu có tương quan Spearman $0{,}986$ với $m_r$ nhưng chỉ $0{,}100$ với $\RAI^{\mathrm{peak}}$ (Hình~\ref{fig:khaipha}b): độ dốc sớm chủ yếu đo \emph{mức nỗ lực nghiên cứu}, không đo \emph{tính tới hạn}. Điều này khớp với luận điểm của bài báo rằng $r$ không đổi ngưỡng $\RAI=1$. Trong phân tích độ quan trọng đặc trưng của RF (bài toán 2 lớp, toàn bộ quỹ đạo), các đặc trưng hình dạng đứng đầu: \code{T50\_tren\_T25} ($0{,}428$), \code{t\_v\_max} ($0{,}202$), \code{gia\_toc\_som} ($0{,}141$); còn \code{v\_dau} chỉ $0{,}004$. Cần thận trọng vì tỷ số \code{T50\_tren\_T25} cũng phụ thuộc $\beta$ nên không nên diễn giải riêng lẻ.
+
+\textbf{Phân cụm.} K-means trên tất cả đặc trưng chỉ khôi phục nhãn ở mức vừa phải: ARI $=0{,}68$ (so với nhãn 2 lớp) và $0{,}72$ (nhãn 3 lớp) khi $k=2$; giảm còn $0{,}39$--$0{,}44$ khi $k=3,4$. Như vậy các chế độ không tách thành cụm rõ ràng khi không dùng nhãn.
+
+\subsection{Kịch bản có nhiễu quan sát}\label{sec:nhieu}
+Các thí nghiệm trên dùng quỹ đạo sạch. Để gần thực tế hơn, nhóm thêm nhiễu Gauss độc lập với độ lệch chuẩn $\sigma$ vào các điểm quan sát $x(t)$, lấy mẫu mỗi 0,25 năm trong cửa sổ $W$ năm đầu (điểm gốc $x(0)=0$ được biết chính xác). Vì đạo hàm số của dữ liệu nhiễu rất không ổn định, đặc trưng ở thí nghiệm này được ước lượng bằng hồi quy bình phương tối thiểu $x(t)\approx bt+ct^2$ trong cửa sổ: bộ ``độ dốc'' là $x(W)/W$; bộ ``hình dạng'' gồm độ cong $c$ và gia tốc tương đối $c/b$. Do đặc trưng khác Mục~\ref{sec:khac} nên các số ở $\sigma=0$ khác nhẹ so với Bảng~\ref{tab:early}. Bộ phân lớp vẫn là RF (60 cây), kiểm định chéo 5 lớp, bài toán 2 lớp.
+
+\begin{table}[ht]
+\centering
+\caption{Độ chính xác của RF khi có nhiễu quan sát (\%), bài toán 2 lớp. Mức đoán lớp đa số: $63{,}7\%$. $\sigma$ là độ lệch chuẩn của nhiễu trên thang năng lực $[0;1]$.}\label{tab:nhieu}
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+$\sigma$ & \textbf{Cửa sổ $W$ (năm)} & \textbf{Độ dốc} & \textbf{Hình dạng} & \textbf{Độ dốc + hình dạng}\\
+\midrule
+0     & 3 & 57,0 & 87,6 & 88,1\\
+      & 5 & 62,7 & 94,8 & 94,9\\
+0,01  & 3 & 57,1 & 67,2 & 68,3\\
+      & 5 & 64,0 & 85,0 & 85,0\\
+0,03  & 3 & 58,3 & 62,2 & 63,5\\
+      & 5 & 63,8 & 74,4 & 76,2\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Bảng~\ref{tab:nhieu} cho thấy chẩn đoán dựa trên hình dạng \emph{nhạy với nhiễu}. Với nhiễu $\sigma=0{,}01$ (1\% thang năng lực), độ chính xác ở cửa sổ 3 năm giảm từ $87{,}6\%$ xuống $67{,}2\%$, chỉ hơn mức đoán đa số vài điểm phần trăm; ở cửa sổ 5 năm vẫn đạt $85{,}0\%$. Với $\sigma=0{,}03$, cửa sổ 3 năm rơi xuống ngang mức đoán đa số ($62{,}2\%$) và cửa sổ 5 năm còn $74{,}4\%$. Bộ ``độ dốc'' hầu như không đổi (khoảng $57$--$64\%$, xấp xỉ mức đoán đa số) vì vốn đã không mang thông tin. Như vậy, kết luận ``hình dạng hơn độ dốc'' vẫn đứng vững ở cửa sổ đủ dài, nhưng lợi thế này thu hẹp nhanh khi dữ liệu nhiễu và cửa sổ ngắn. Thí nghiệm này dùng lưới nhỏ (3 mức nhiễu, 2 cửa sổ, một lần gieo nhiễu), nên các con số cụ thể chỉ có tính minh họa.
+
+\section{Đánh giá và hạn chế}
+Kết quả ủng hộ luận điểm của bài báo \emph{trong phạm vi mô hình}: hình dạng quỹ đạo (gia tốc, tốc độ tăng) mang thông tin về tính tới hạn, còn độ dốc sớm chủ yếu phản ánh mức nỗ lực. Các hạn chế cần nêu rõ:
+\begin{itemize}
+  \item Dữ liệu là tổng hợp và nhãn là hàm xác định của tham số $(a,\beta,k)$; thí nghiệm là kiểm chứng \emph{nội bộ mô hình}, không chứng minh điều gì về hệ AI thực.
+  \item Thí nghiệm có nhiễu (Mục~\ref{sec:nhieu}) chỉ dùng lưới nhỏ và một lần gieo nhiễu; nhiễu độc lập Gauss cũng là giả định đơn giản so với dữ liệu đo thực. Các thí nghiệm còn lại dùng quỹ đạo sạch nên độ chính xác ngoài thực tế sẽ thấp hơn.
+  \item Các ngưỡng nhãn (1 và 2), tập đặc trưng và khoảng tham số do nhóm chọn; kết quả có thể thay đổi theo lựa chọn này.
+  \item Mức đoán lớp đa số ($63{,}7\%$) và mất cân bằng lớp ở bài toán 3 lớp cần được tính đến khi đọc độ chính xác; vì vậy báo cáo ghi cả độ chính xác cân bằng.
+\end{itemize}
+
+% ---------------------------------------------------------------------
+\chapter{Phân tích mở rộng các tài liệu liên quan}\label{ch:morong}
+% ---------------------------------------------------------------------
+\section{Tài liệu liên quan nhất mà bài báo tham chiếu}\label{sec:cited}
+Từ danh sách tham khảo của bài báo, nhóm chọn ba tài liệu gần nhất về chủ đề và đối chiếu với bài báo~\cite{burtsev2026}. Nhóm đọc toàn văn tài liệu thứ nhất; với hai tài liệu còn lại, nhóm chỉ đọc phần tóm tắt chính thức nên phần đối chiếu mang tính khái quát.
+
+\subsection{Cunningham và cộng sự (2026): \en{The Economics of Recursive Self-Improvement}}
+Bài báo~\cite{cunningham2026} do nhóm tác giả thuộc \en{Elasticity Institute} (gồm các nhà nghiên cứu ở METR, Stanford, Virginia, Carnegie Mellon, Columbia, MIT và Yale) viết, đăng arXiv ngày 14/9/2026 (arXiv:2609.15802, chuyên mục econ.GN). Bài báo Burtsev dẫn bản báo cáo kỹ thuật tháng 7/2026 của cùng công trình và nhận xét rằng nó dẫn ra một điều kiện gần giống cho gia tốc tự duy trì theo các độ co giãn kinh tế.
+
+\textbf{Nội dung.} Nhóm tác giả biểu diễn quá trình phát triển AI bằng các đồ thị có hướng, trong đó cạnh là độ co giãn của một biến theo biến đầu vào. \emph{Gia tốc tự duy trì} xảy ra khi tổng độ co giãn của tốc độ cải tiến thuật toán theo chính trình độ thuật toán vượt 1. Với mô hình cơ sở có vòng phản hồi lõi, điều kiện là $\varepsilon_{\dot A,A}+\varepsilon_{\dot A,C}\,\varepsilon_{C,A}>1$ (với $A$ là hiệu quả thuật toán, $C$ là năng lực AI). Khi có nhiều biến tích lũy (thuật toán, tính toán huấn luyện, dữ liệu, \dots), điều kiện trở thành bán kính phổ của ma trận độ co giãn lớn hơn 1, theo khung của Davidson và cộng sự. Bài báo còn phân biệt năng lực ``hẹp'' và ``rộng'', bàn về các nút thắt (nhân lực, tính toán thực nghiệm, dữ liệu) và đưa ra danh sách số liệu mà các phòng thí nghiệm nên công bố. Phần hiệu chỉnh sơ bộ cho thấy điều kiện chỉ thỏa nếu mỗi đơn vị năng lực (theo chỉ số ECI) làm tăng năng suất R\&D ít nhất khoảng 15\%, trong khi ước tính thô hiện nay khoảng 9\%; kết luận là chưa có gia tốc tự duy trì nhưng đang mạnh lên~\cite{cunningham2026}.
+
+\textbf{So với bài báo của Burtsev.} Hai công trình cùng đi đến ngưỡng bằng 1 và cùng dùng giá trị riêng trội/bán kính phổ cho hệ nhiều thành phần, nên có sự hội tụ về dạng điều kiện. Khác biệt chính là (i) Burtsev dùng mô hình \emph{động lực có trễ} và xét \emph{ổn định cục bộ} của nhiễu loạn, nên bàn được thang thời gian (độ trễ $\tau$) và tính tạm thời do biên hữu hạn, còn Cunningham và cộng sự phát biểu điều kiện đại số về độ co giãn; (ii) Cunningham và cộng sự \emph{hiệu chỉnh bằng số liệu thực}, trong khi các tham số $a,\beta,k$ của Burtsev chưa có ước lượng thực nghiệm; (iii) Cunningham và cộng sự nhấn mạnh nút thắt và phân biệt năng lực hẹp/rộng, còn Burtsev nhấn mạnh phân biệt \emph{tiến bộ nhanh} với \emph{tự khuếch đại} và vai trò của đóng vận hành $\chi$.
+
+\subsection{Davidson, Halperin, Houlden, Korinek (2026): \en{When Does Automating AI Research Produce Explosive Growth?}}
+Đây là bản thảo NBER số 35155~\cite{davidson2026}. Các tác giả xây dựng mô hình tăng trưởng bán nội sinh có \emph{mạng đổi mới}, trong đó nghiên cứu và tự động hóa ở một lĩnh vực làm tăng năng suất nghiên cứu ở lĩnh vực khác, và rút ra một điều kiện giải tích để tăng trưởng thành siêu mũ (``bùng nổ''). Hai kênh khuếch đại là vòng phản hồi công nghệ giữa các lĩnh vực nghiên cứu và vòng phản hồi kinh tế (sản lượng cao hơn tài trợ thêm nghiên cứu). Trong một mô phỏng hiệu chỉnh theo xu hướng tiến bộ AI, việc tự động hóa hoàn toàn nghiên cứu phần mềm cùng tự động hóa khiêm tốn (5\%) ở các lĩnh vực khác dẫn tới điểm kỳ dị trong sáu năm; các nút thắt không đảo ngược kết quả nếu tự động hóa tác vụ đủ nhanh~\cite{davidson2026}.
+
+\textbf{So với bài báo của Burtsev.} Cấu trúc ``mạng'' tương ứng với ma trận $\mathbf{K}$ của Burtsev, nhưng câu hỏi khác nhau: Davidson và cộng sự hỏi khi nào tăng trưởng \emph{vô hạn trong thời gian hữu hạn}, còn Burtsev hỏi khi nào nhiễu loạn nhỏ được \emph{khuếch đại cục bộ} và nhấn mạnh biên hữu hạn khiến khuếch đại chỉ tạm thời. Kết luận của hai bài bổ sung cho nhau: Burtsev cho thấy siêu tới hạn có thể mạnh nhưng tự giới hạn trong một mô hình nghiên cứu cố định, trong khi Davidson và cộng sự bàn về các điều kiện kinh tế để vòng phản hồi không bị dập tắt.
+
+\subsection{Chen, Wang, Qu (2026): \en{Recursive Self-Improvement in AI}}
+Bài khảo sát~\cite{chen2026} (arXiv:2607.07663, đăng 8/7/2026) phân loại 1\,250 bài arXiv giai đoạn 2024--2026 theo hai trục: đối tượng được cải tiến (đầu ra, chính sách, bộ đánh giá, quy trình nghiên cứu) và mức khép kín của vòng lặp (con người trong vòng, con người giám sát, hoàn toàn tự động). Điểm chính là phân biệt \emph{tự tinh chỉnh có giới hạn} (hội tụ, đánh giá được, đã dùng trong công nghiệp) với RSI mở, vốn bị giới hạn bởi yêu cầu bám thực tế, hiện tượng suy sụp và ràng buộc tính toán; các tín hiệu tự đánh giá được xếp thành hệ thứ bậc từ bộ kiểm chứng hình thức (mạnh nhất) đến tự đánh giá nội tại (yếu nhất)~\cite{chen2026}.
+
+\textbf{So với bài báo của Burtsev.} Hai bài đi theo hướng khác nhau: một bên là mô hình toán, một bên là khảo sát thực nghiệm văn liệu. Theo cách đọc của nhóm (không phải kết luận của tác giả nào), hệ thứ bậc kiểm chứng của Chen và cộng sự cho một gợi ý định tính về điều gì quyết định đóng vận hành $\chi$ của Burtsev: một cải tiến chỉ đi tiếp vào hệ kế tiếp khi vượt qua khâu đánh giá và tích hợp. Đây là phép liên hệ để thảo luận, chưa được kiểm chứng bằng số liệu.
+
+\subsection{Bảng so sánh}
+\begin{table}[ht]
+\centering
+\small
+\caption{So sánh bài báo của Burtsev với hai công trình lý thuyết gần nhất.}\label{tab:sosanh}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}p{4.0cm}>{\raggedright\arraybackslash}p{4.0cm}>{\raggedright\arraybackslash}p{4.0cm}@{}}
+\toprule
+\textbf{Tiêu chí} & \textbf{Burtsev (2026)} & \textbf{Cunningham và cs. (2026)} & \textbf{Davidson và cs. (2026)}\\
+\midrule
+Loại mô hình & Phương trình vi phân có trễ; ổn định cục bộ & Đồ thị độ co giãn; điều kiện đại số & Tăng trưởng bán nội sinh với mạng đổi mới\\
+Điều kiện ngưỡng & $\RAI=\chi a/\sigma>1$ & Tổng độ co giãn $>1$ (bán kính phổ ma trận độ co giãn $>1$) & Điều kiện giải tích: phản hồi công nghệ và kinh tế vượt lợi suất giảm dần\\
+Nhiều thành phần & Ma trận $\mathbf{K}$, $\Rnet=\rho(\mathbf{K})$ & Ma trận $\mathbf{M}$ của các biến tích lũy & Mạng nhiều lĩnh vực nghiên cứu\\
+Nghiên cứu ngày càng khó & $\sigma\to\infty$ gần biên, nên khuếch đại tạm thời & Lợi suất giảm dần (``ý tưởng khó tìm'') & Lợi suất giảm dần được bù bằng tự động hóa\\
+Số liệu thực & Chỉ hiệu chỉnh $r_{\mathrm{ref}}$ và $\tau$; $a,\beta,k$ là giả định & Hiệu chỉnh sơ bộ: ngưỡng $\approx15\%$ so với ước tính $\approx9\%$ & Mô phỏng hiệu chỉnh: điểm kỳ dị trong 6 năm (kịch bản)\\
+Thông điệp chính & Tiến bộ nhanh khác tự khuếch đại; siêu tới hạn có thể tạm thời & Chưa có gia tốc tự duy trì nhưng đang mạnh lên & Tự động hóa AI R\&D có thể gây tăng trưởng bùng nổ\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Bài báo có tham chiếu tới bài báo này}\label{sec:citing}
+Tính đến ngày 12/10/2026, nhóm \textbf{không tìm thấy bài báo học thuật nào} (trên arXiv, DBLP hay các trang tổng hợp) trích dẫn bài của Burtsev; đây là điều dễ hiểu vì bài mới đăng sáu tuần. Số liệu đầy đủ cần xem ``Cited by'' trên Google Scholar (Mục~\ref{sec:scholarbai}). Nhóm chỉ ghi nhận một số nhắc đến \emph{không phải bài báo khoa học}:
+\begin{itemize}
+  \item Bài biên tập của \en{Turing Post} về ``tự cải tiến đệ quy là gì'', nhắc đến bài báo khi bàn rằng tiến bộ AI nhanh chưa chắc là RSI~\cite{turingpost}.
+  \item Bản tin điểm bài của \en{AI Weekly} tóm tắt ngưỡng $\RAI$~\cite{aiweekly} và bản tin \en{AI Daily Digest} ngày 15/9/2026 xếp bài vào mục bài báo đáng chú ý~\cite{digest}.
+  \item Một đề xuất trên GitHub (kho \texttt{entif-ai/rosetta}, \#1585) xây dựng gói lược đồ để biểu diễn, phát lại và kiểm toán các đại lượng động lực trong bài báo; đề xuất này nói rõ không hàm ý sự chứng thực của tác giả~\cite{entif}.
+\end{itemize}
+Các nguồn trên cho thấy bài báo đã thu hút sự chú ý của cộng đồng ngoài học thuật, nhưng chưa phải bằng chứng về tác động học thuật.
+
+% ---------------------------------------------------------------------
+\chapter{Liên hệ với nghiên cứu của nhóm}\label{ch:lienhe}
+% ---------------------------------------------------------------------
+\todo{Mô tả nghiên cứu của nhóm và các điểm giao với bài báo (khái niệm, phương pháp)}
+
+% ---------------------------------------------------------------------
+\chapter*{Kết luận}
+\addcontentsline{toc}{chapter}{Kết luận}
+% ---------------------------------------------------------------------
+Báo cáo đã phân tích bài báo của Burtsev về tính tới hạn đệ quy của tự cải tiến AI, tái hiện độc lập các kết quả số chính và mở rộng bằng khai phá dữ liệu. Các kết quả chính:
+\begin{itemize}
+  \item Bài báo đưa ra số tái sản xuất đệ quy $\RAI=\chi a/\sigma$ làm ngưỡng cho tự khuếch đại, độc lập với mức năng lực cụ thể và (trong mô hình tối giản) với năng suất nghiên cứu nền; với nhiều tác nhân, ngưỡng là $\rho(\mathbf{K})$.
+  \item Cài đặt lại của nhóm trùng Table~1 và Table~2 của bài báo (sai khác không quá $0{,}005$ năm), và tái hiện đúng dạng Fig.~3, Fig.~4b.
+  \item Trên 4000 quỹ đạo tổng hợp, độ dốc sớm của đường cong năng lực chỉ phản ánh mức nỗ lực nghiên cứu (Spearman $0{,}986$ với $m_r$ và $0{,}100$ với $\RAI^{\mathrm{peak}}$), còn đặc trưng hình dạng cho phép chẩn đoán chế độ chính xác $87$--$96\%$ chỉ từ 2--5 năm đầu (dữ liệu không nhiễu), trong khi độ dốc chỉ đạt $56$--$63\%$. Khi thêm nhiễu quan sát $1\%$ thang năng lực, độ chính xác của bộ hình dạng giảm còn khoảng $67\%$ (cửa sổ 3 năm) và $85\%$ (cửa sổ 5 năm).
+\end{itemize}
+Hạn chế chính là dữ liệu tổng hợp và tham số chưa ràng buộc bởi thực nghiệm. Hướng phát triển: mở rộng thí nghiệm nhiễu (nhiều mức nhiễu, nhiều lần gieo, nhiễu có tương quan), mở rộng sang kịch bản giới hạn hạ tầng, và thử với chuỗi dữ liệu thực về tiến bộ AI khi có dữ liệu đủ sạch.
+\todo{Hoàn thiện kết luận sau khi bổ sung Chương~\ref{ch:gioithieu}, \ref{ch:morong} và \ref{ch:lienhe}}
+
+% =====================================================================
+% PHỤ LỤC
+% =====================================================================
+\appendix
+\chapter{Hướng dẫn chạy mã nguồn}\label{app:ma}
+Cấu trúc thư mục dự án:
+\begin{itemize}
+  \item \code{main.tex}, \code{latexmkrc}: báo cáo (XeLaTeX).
+  \item \code{figures/}: các hình dùng trong báo cáo (PDF, PNG).
+  \item \code{code/}: mã Python (\code{run\_all.py}, \code{rsi\_*.py}, \code{requirements.txt}).
+  \item \code{data/}: dữ liệu và kết quả (CSV, JSON) do \code{run\_all.py} sinh ra.
+\end{itemize}
+Chạy thực nghiệm (cần Python 3.9 trở lên):
+\begin{verbatim}
+cd code
+pip install -r requirements.txt
+python run_all.py      # bảng, hình, dữ liệu (vài phút)
+python run_noise.py    # kịch bản có nhiễu (khoảng 1 phút)
+\end{verbatim}
+Lệnh này tái tạo toàn bộ bảng, hình và dữ liệu của Chương~\ref{ch:thucnghiem} trong khoảng vài phút. Để biên dịch báo cáo: \code{latexmk -xelatex main.tex} (hoặc bấm Build trong VS Code, hoặc chọn trình biên dịch XeLaTeX trên Overleaf).
+
+% =====================================================================
+% TÀI LIỆU THAM KHẢO
+% =====================================================================
+\begin{thebibliography}{99}
+\addcontentsline{toc}{chapter}{Tài liệu tham khảo}
+\bibitem{burtsev2026} M.~Burtsev, \en{``Recursive Criticality of AI Self-Improvement''}, arXiv:2609.00137v1 [cs.AI], 31/8/2026. \url{https://arxiv.org/abs/2609.00137}
+\bibitem{burtsevcode} M.~Burtsev, \en{recursive-criticality-ai} (sổ tay tính toán đi kèm bài báo), kho mã GitHub. \url{https://github.com/burtsev/recursive-criticality-ai}
+\bibitem{cunningham2026} T.~Cunningham, L.~Althoff, B.~Halperin, B.~Jabarian, A.~Koh, A.~Ramani, P.~Trammell, P.~Whitfill, C.~Wu, \en{``The economics of recursive self-improvement''}, arXiv:2609.15802 [econ.GN], 14/9/2026 (bài báo Burtsev dẫn bản báo cáo kỹ thuật \en{Elasticity Institute}, 7/2026). \url{https://arxiv.org/abs/2609.15802}
+\bibitem{davidson2026} T.~Davidson, B.~Halperin, T.~Houlden, A.~Korinek, \en{``When does automating AI research produce explosive growth? Feedback loops in innovation networks''}, NBER Working Paper 35155, 2026. DOI: 10.3386/w35155. \url{https://www.nber.org/papers/w35155}
+\bibitem{grace2025} K.~Grace \en{et al.}, \en{``Thousands of AI authors on the future of AI''}, \en{Journal of Artificial Intelligence Research}, vol.~84, 2025.
+\bibitem{pedregosa2011} F.~Pedregosa \en{et al.}, \en{``Scikit-learn: Machine learning in Python''}, \en{Journal of Machine Learning Research}, 12:2825--2830, 2011.
+\bibitem{breiman2001} L.~Breiman, \en{``Random forests''}, \en{Machine Learning}, 45(1):5--32, 2001.
+\bibitem{hubert1985} L.~Hubert, P.~Arabie, \en{``Comparing partitions''}, \en{Journal of Classification}, 2(1):193--218, 1985.
+\bibitem{chen2026} M.~Chen, L.~Wang, B.~Qu, \en{``Recursive self-improvement in AI: From bounded self-refinement to autonomous research loops''}, arXiv:2607.07663 [cs.AI], 8/7/2026. \url{https://arxiv.org/abs/2607.07663}
+\bibitem{arxivabs} arXiv, trang tóm tắt bài \en{Recursive Criticality of AI Self-Improvement}, arXiv:2609.00137. \url{https://arxiv.org/abs/2609.00137} (truy cập 12/10/2026).
+\bibitem{hfdaily} Hugging Face, \en{Daily Papers}: \en{Recursive Criticality of AI Self-Improvement}. \url{https://huggingface.co/papers/2609.00137} (truy cập 12/10/2026).
+\bibitem{lims} London Institute for Mathematical Sciences, trang cá nhân \en{Mikhail Burtsev}. \url{https://lims.ac.uk/mikhail-burtsev/} (truy cập 12/10/2026).
+\bibitem{mgp} \en{Mathematics Genealogy Project}, \en{Mikhail S. Burtsev} (MGP ID 334843). \url{https://mathgenealogy.com/id.php?id=334843} (truy cập 12/10/2026).
+\bibitem{dblp} DBLP, hồ sơ \en{Mikhail Burtsev 0001}. \url{https://dblp.uni-trier.de/pid/85/5425.html} (bản lưu cập nhật 2/7/2025; truy cập 12/10/2026).
+\bibitem{scholarprofile} Google Scholar, hồ sơ \en{Mikhail Burtsev}. \url{https://scholar.google.com/citations?user=t_PLQakAAAAJ}
+\bibitem{alphaxiv} alphaXiv, hồ sơ \en{Mikhail Burtsev} (số liệu đồng bộ từ Google Scholar). \url{https://www.alphaxiv.org/@mikhail-burtsev-mihail-burcev} (truy cập 12/10/2026).
+\bibitem{awesome} \en{awesomepapers.io}, trang bài \en{Recursive Criticality of AI Self-Improvement}. \url{https://awesomepapers.io/machine-learning/papers/hf2609.00137} (truy cập 12/10/2026).
+\bibitem{turingpost} \en{Turing Post}, \en{``What is recursive in RSI''}. \url{https://www.turingpost.com/p/what-is-recursive-in-rsi} (truy cập 12/10/2026).
+\bibitem{aiweekly} \en{AI Weekly}, \en{``Burtsev proposes $\mathcal{R}_{AI}$ threshold for self-amplifying AI R\&D''}. \url{https://aiweekly.co/alerts/burtsev-proposes-ai-threshold-for-self-amplifying-ai-rd} (truy cập 12/10/2026).
+\bibitem{digest} \en{AI Daily Digest}, số 153, 15/9/2026. \url{https://github.com/diclogic/ai-daily-digest/issues/153}
+\bibitem{entif} \en{entif-ai/rosetta}, \en{issue} \#1585: \en{Recursive Criticality SchemaPack}. \url{https://github.com/entif-ai/rosetta/issues/1585} (truy cập 12/10/2026).
+\end{thebibliography}
+
+\end{document}
