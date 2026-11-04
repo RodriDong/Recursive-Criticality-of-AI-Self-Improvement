@@ -170,3 +170,18 @@ plt.tight_layout(); plt.savefig(FIGS / "fig_khai_pha_vi.pdf"); plt.savefig(FIGS 
 OUT["tham_so_tom_tat"] = {c: [float(df[c].min()), float(df[c].max())] for c in ["a", "beta", "k", "tau", "m"]}
 json.dump(OUT, open(DATA / "tom_tat.json", "w"), ensure_ascii=False, indent=2)
 print(json.dumps(OUT, ensure_ascii=False, indent=1))
+
+# ---------------------------------------------------------------- 4. Các hình còn lại của bài báo (Fig. 1, 2, 4a, 5)
+# Chạy kèm run_fig_con_thieu.py để một lệnh `python run_all.py` tạo đủ cả 7 hình.
+#   python run_all.py            -> mọi hình (Fig. 5 lưới 61x61, vài phút)
+#   python run_all.py --nhanh    -> Fig. 5 lưới thô 21x21 (dưới 1 phút)
+#   python run_all.py --robust   -> chạy thêm run_robust.py + tao_bang_tex.py (5 seed, khoảng 10 phút)
+import subprocess, sys
+HERE = pathlib.Path(__file__).resolve().parent
+def chay(*args):
+    print("\n>>>", " ".join(args), flush=True)
+    subprocess.run([sys.executable, *args], cwd=HERE, check=True)
+chay("run_fig_con_thieu.py", *(["--nhanh"] if "--nhanh" in sys.argv else []))
+if "--robust" in sys.argv:
+    chay("run_robust.py"); chay("tao_bang_tex.py")
+print("\nHoàn tất. Hình trong", FIGS)
