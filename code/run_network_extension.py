@@ -21,13 +21,14 @@ DATA = ROOT / "data"
 DATA.mkdir(exist_ok=True)
 
 SIZES = [3, 5, 10]
-RHO_LEVELS = [0.5, 0.8]
-
+RHO_LEVELS = [0.5, 0.8, 1.0, 1.2, 1.5]
+#RHO_LEVELS = [0.5, 0.8]
 REPEATS = 20
 
 M = 1.0
 TAU = 0.5
 HORIZON = 50.0
+#HORIZON = 30.0
 DT = 0.01
 
 rng = np.random.default_rng(42)
